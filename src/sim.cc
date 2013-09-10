@@ -114,7 +114,7 @@ void Simulation::adaptive()
 void Simulation::add_probes(int Nprobes, double r0, double v0)
 /* add some probes to the simulation */
 {
-	int i,j,d;
+	int i;
 	double pi = 3.14159;
 
 	std::cout << "> Probe start: r0 = " << r0 << " m,  v0 = " << v0 << " m/s." << std::endl;
@@ -274,7 +274,7 @@ void Simulation::prepare()
 
 void Simulation::run(int Ndays, double Tstep)
 {
-    int i,j;
+    int i;
 
 	data.Ndays = Ndays; // earth days to simulate 
 	data.Tstep = Tstep;	// time step [s]

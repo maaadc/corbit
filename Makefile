@@ -1,14 +1,22 @@
 CC=g++
 CFLAGS=-Wall -O2
 LDFLAGS=
-SOURCES=corbit.cc data.cc sim.cc
+
+TARGET=corbit
+
+SRCDIR=src
+BUILDDIR=build
+
+SOURCES=$(shell find $(SRCDIR) -type f -name *.cc)
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=corbit
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(SOURCES) $(TARGET)
 
-$(EXECUTABLE): $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
-.cpp.o:
+$(SOURCES):
 	$(CC) $(CFLAGS) $< -o $@
+
+clean:
+	$(RM) -r $(BUILDDIR) $(TARGET)
