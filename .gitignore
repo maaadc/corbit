@@ -1,0 +1,10 @@
+# Compiled source code
+corbit
+*.o
+*.so
+
+# Input and output data
+*.dat
+
+# Vim swap files
+*.swp
