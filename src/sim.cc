@@ -31,6 +31,7 @@ void Simulation::acceleration()
 /* calculate acceleration of each object based on Newton's law */
 {
     int i,j,d;
+	int j_max;
 	
 	/* Modes (highest accuracy and lowest speed at bottom):
 	 * ad_index = ...
@@ -39,14 +40,22 @@ void Simulation::acceleration()
 	 * data.N			Each object interacts with each other
 	 */
 	    
-    // External acceleration. Planets have zero, probes can have finite through engines 
+    // External acceleration:
+	// Planets have zero, probes can have finite through engines 
 	A = Aext;
 
     // Gravitational acceleration: For each object i ...
     for (i = 0; i < data.N; i++)
+	{
+		if (i >= data.Nplanets && ad_index == 1)
+			j_max = 1;
+		else
+			j_max = i;
+
         // ... add up the accelerations towards objects j
-        for (j = 0; j < std::min(i, ad_index); j++)
+        for (j = 0; j < j_max; j++)
         // calculate only the lower half up to the diagional
+		// and neglect probe-probe interaction
 		{
 			// vector x_ij from object i to j
 			for (d = 0; d < 3; d++)
@@ -59,10 +68,10 @@ void Simulation::acceleration()
 				// add to acceleration of objects i and j
 				// by using x_ij = - x_ji
 				A(i,d) += M(j) * x_ij(d);
-				//A(j,d) -= M(data.N-1-j) * x_ij(d);
 				A(j,d) -= M(i) * x_ij(d);
 			}
 		}
+	}
 }
 
 
@@ -72,7 +81,7 @@ void Simulation::adaptive()
 	int i;
 	double norm = 0;
 	double maxacc = 0;
-	const double threshold = 2.e-4;	
+	const double threshold = 1.e-3;	
 	ublas::matrix<double> Atemp;
 
 	// get maximum gravitational acceleration of probes caused by planets:
@@ -86,7 +95,7 @@ void Simulation::adaptive()
 	acceleration();
 		
 	// calculate acc caused by planets over acc with sun and get maximum
-	for (i = 1; i < data.N; i++) //data.Nplanets; i < data.N; i++)
+	for (i = data.Nplanets; i < data.N; i++) 
 	{
 		norm = ublas::norm_2( ublas::row(A-Atemp, i) ); 
 		norm /= ublas::norm_2( ublas::row(A-Aext, i) );
@@ -127,7 +136,8 @@ void Simulation::add_probes(int Nprobes, double r0, double v0)
 	{
 		Body bod;
 
-		bod.name = "probe" + i;
+		bod.name = "pr";
+		bod.name += (char) (i+65);	// prA, prB, ...
 		bod.color = "#aaaaaa";
 		bod.is_probe = 1;
 		
@@ -168,6 +178,13 @@ void Simulation::collision()
 	double dist, coll_radius;
 	double radius_factor = 2.;
 
+	// fill matrix D(i, j) with distance between objects i and j, j < i
+	D = ublas::zero_matrix<double> (data.N, data.N);
+	for (i = 0; i < data.N; i++)
+		for (j = 0; j < i; j++)
+			D(i,j) = ublas::norm_2( ublas::row(X, j) - ublas::row(X, i) );
+	
+	// check for collisions of probes
 	for (i = 0; i < data.Nplanets; i++)
 		for (j = data.Nplanets; j < data.N; j++) 
 		{
@@ -283,7 +300,7 @@ void Simulation::run(int Ndays, double Tstep)
 	prepare();
 	
    	// console output 
-	std::cout << "> Starting simulation of " << data.N << " objects for " << std::setprecision(3);
+	std::cout << "> Starting simulation of " << data.N << " objects for " << std::setprecision(2);
 	std::cout << std::fixed << (double) data.Ndays/365 << " year(s)." << std::endl;
 	 
     // set acceleration for 1st time step
@@ -312,9 +329,8 @@ void Simulation::run(int Ndays, double Tstep)
 		collision();
 			
 		// console output
-		std::cout << "\r> Running: " << 100*(i+1)/data.Ndays << " % (" << i+1;
-		std::cout << " of " << data.Ndays << " d) at " << (double) i/timer.elapsed();
-		std::cout << " d/s." << std::flush;
+		std::cout << "\r> Running: " << (double) 100*(i+1)/data.Ndays << " % at ";
+		std::cout << (double) i/timer.elapsed()  " d/s." << std::flush;
 	}
     
     // close output

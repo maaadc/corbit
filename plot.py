@@ -64,14 +64,15 @@ for line in filehandle:
 
 filehandle.close()
 
-# X shape [Ndays,N,3] => [N,Ndays,3]
-X = np.swapaxes(X, 0,1)
-
 # calculate abs(V) and store in V[i,j,3]
 V.resize((Ndays,N,4));
 for i in range(Ndays):
 	for j in range(N):
 		V[i,j,3] = np.linalg.norm( V[i,j,0:3]  )
+
+# prepare shape [Ndays,N,3] => [N,Ndays,3] for plotting
+X = np.swapaxes(X, 0,1)
+V = np.swapaxes(V, 0,1)
 
 # use real planet names and make up names for probes
 n = ["sun", "mercury", "venus", "earth", "mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]
@@ -80,9 +81,10 @@ n += n_probe
 
 print str(N) + " objects found."
 
-# set 3d figure
+# set subplots
 fig = plt.figure()
-ax = fig.add_subplot(111, projection="3d", axisbg='black')
+ax1 = fig.add_subplot(211, projection="3d", axisbg='black')
+#ax2 = fig.add_subplot(122)
 
 # choose different colors for each trajectory
 color_planets = plt.cm.jet(np.linspace(0, 1, Nplanets))
@@ -91,23 +93,23 @@ colors = np.vstack((color_planets, color_probes))
 #colors = ("#ffcc00', 
 
 # set trajectories, only lines get labels
-lines  = sum( [ax.plot([], [], [], '-', color=c, label=l) for c, l in zip(colors, n)], [] )
-points = sum( [ax.plot([], [], [], 'o', color=c) for c in colors], [] )
+lines  = sum( [ax1.plot([], [], [], '-', color=c, label=l) for c, l in zip(colors, n)], [] )
+points = sum( [ax1.plot([], [], [], 'o', color=c) for c in colors], [] )
 
 # set plot layout 
-limit = (-1,1)			# axes limits
+limit = (-5,5)			# axes limits
 #limit = (-20,20)
-ax.set_xlim(limit)
-ax.set_ylim(limit)
-ax.set_zlim(limit)
-ax.axis("off") 				# disable axes
+ax1.set_xlim(limit)
+ax1.set_ylim(limit)
+ax1.set_zlim(limit)
+ax1.axis("off") 				# disable axes
 # put legend to the right of the plot
 #ax.legend(loc="center left", bbox_to_anchor=(1., 0.5), prop={"size":12})	
-ax.legend(loc="center right", bbox_to_anchor=(1., 0.5), prop={"size":12})	
+#ax1.legend(loc="center right", bbox_to_anchor=(1., 0.5), prop={"size":12})	
 counter = plt.figtext(0.1, 0.9, "-", color="white")	# prepare text window
 
 # set point-of-view: theta and phi in degrees
-ax.view_init(90, 0) # 60, 20
+ax1.view_init(90, 0) # 60, 20
 
 # function is called each frame 
 def anim_sequence(i):
@@ -139,6 +141,17 @@ anim_sequence(Ndays)
 # save animation as mp4, ffmpeg needed
 #anim.save("test.mp4", fps=30), extra_args=["-vcodec", "libx264"])
 
+# show speed
+ax2 = plt.subplot(212, axisbg="black")
+#ax2.set_yscale("log")
+#ax2.set_ylim((1.e-2,1.e2))
+
+for i in range(N):
+	plt.plot(np.arange(Ndays), V[i,:,3], c=colors[i])
+
+# add a legend
+fig.legend(lines, n, loc="center right", prop={"size":11})	
+
 # show plot with tight layout
-plt.tight_layout()
+#plt.tight_layout()
 plt.show()

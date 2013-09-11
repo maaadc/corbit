@@ -17,10 +17,10 @@ int main()
 	sim.data.load("planets.dat");
 	
 	// add probes starting from earth
-	sim.add_probes(10, 1.e9, 1.e4);
-	
+	sim.add_probes(40, 1.e9, 1.e4);
+
     // run simulation
-    sim.run(50, 10.);
+    sim.run(20*365, 10.);
 
 	// save data
 	sim.data.save();

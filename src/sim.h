@@ -63,6 +63,7 @@ private:
 	ublas::matrix<double> A;		// [N,3] acceleration
 	ublas::matrix<double> Aext;		// [N,3] external acceleration
 	ublas::vector<double> W;		// [3] Wtot, Wkin, Wpot
+	ublas::matrix<double> D;		// [N,N] distance
    
    	/* temporary variables, used by few functions */
 	double temp;
