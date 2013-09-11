@@ -1,11 +1,15 @@
 corbit
 ======
 
-Simulation of satellites in our solar system
+Overview
+--------
+Simulates an N-body system with gravitational interaction using the Velocity Verlet algorithm. The sun, planets and probes (e. g. Satellites) can be declared via a text file. The interaction between planets and probes is neglected, if a probe is far away from a planet.<br />
+The output can be visualized in 3D along with some other plots.
 
 
 Dependencies
-============
-Simulation (corbit): g++ 4, boost 1.49
-Plotting (vis.py): python 2, numpy, matplotlib
-Runs fine on Debian Wheezy
+------------
+Compiles and runs fine on Debian Wheezy with the following dependencies:<br />
+Simulation (corbit): g++ 4.7.2, boost 1.49<br />
+Plotting (plot.py): python 2.7.3, numpy 1.6.2, matplotlib 1.1.1
+
