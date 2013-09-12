@@ -1,5 +1,6 @@
 corbit
 ======
+The aim of this hobby simulation is to find a way for a Planetary Grand Tour, see http://en.wikipedia.org/wiki/Planetary_Grand_Tour
 
 Overview
 --------
